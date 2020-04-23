@@ -3,7 +3,9 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const ini = require('ini');
 const fs = require('fs');
-const stuffRoutes = require('./routes/stuff')
+const stuffRoutes = require('./routes/stuff');
+const userRoutes = require('./routes/user');
+
 
 const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
 
@@ -19,7 +21,7 @@ mongoose.connect(mongoAccess ,{
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser())
 
 
 app.use((req,res,next) =>{
@@ -29,9 +31,9 @@ app.use((req,res,next) =>{
     next();
 });
 
-app.use('/api/suff', stuffRoutes);
+app.use('/api/stuff', stuffRoutes);
+app.use('/api/auth', userRoutes);
 
 
-
-module.exports = app; 
+module.exports = app
 
