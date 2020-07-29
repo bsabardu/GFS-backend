@@ -2,9 +2,11 @@ const Thing = require('../models/Thing');
 const express = require('express');
 
 exports.createThing = (req,res,next) => {
-    delete req.body._id;
+    const thingObject = JSON.parse(req.body.thing);
+    delete thingObject._id;
     const thing = new Thing({
-        ...req.body
+        ...thingObject,
+        imageUrl : `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
     thing.save()
     .then(() => res.status(201).json({message: "L'objet est bien sauvegardé dans la base"}))
@@ -25,13 +27,20 @@ exports.readOneThing = (req,res,next) => {
 };
 
 exports.updateThing = (req,res,next) => {
-    Thing.updateOne({_id: req.params.id}, {...req.body, _id: req.params.id})
+    const thingObject = req.file ? 
+    { 
+        ...JSON.parse(req.body.thing),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : {...req.body}
+
+    Thing.updateOne({_id: req.params.id}, {...thingObject, _id: req.params.id})
     .then(() => res.status(200).json({message: "Objet modifié"}))
     .catch(error => res.status(404).json({error}));
+
 };
 
 exports.deleteThing = (req,res,next) => {
-    Thing.deleteOne({_id: req.params.id})
+    Thing.deleteOne({_id: req.params.id}) 
     .then(() => res.status(200).json({message: "Objet supprimé"}))
     .catch(error => res.status(404).json({error}));
 };

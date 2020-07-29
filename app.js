@@ -5,6 +5,7 @@ const ini = require('ini');
 const fs = require('fs');
 const stuffRoutes = require('./routes/stuff');
 const userRoutes = require('./routes/user');
+const path = require('path')
 
 
 const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
@@ -31,6 +32,7 @@ app.use((req,res,next) =>{
     next();
 });
 
+app.use('/images',express.static(path.join(__dirname,'images')));
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes);
 
