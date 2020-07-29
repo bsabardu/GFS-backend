@@ -1,5 +1,6 @@
 const Thing = require('../models/Thing');
 const express = require('express');
+const fs = require('fs');
 
 exports.createThing = (req,res,next) => {
     const thingObject = JSON.parse(req.body.thing);
@@ -40,8 +41,15 @@ exports.updateThing = (req,res,next) => {
 };
 
 exports.deleteThing = (req,res,next) => {
-    Thing.deleteOne({_id: req.params.id}) 
-    .then(() => res.status(200).json({message: "Objet supprimé"}))
-    .catch(error => res.status(404).json({error}));
+    Thing.findOne({_id: req.params.id})
+    .then(thing => {
+        const filename = thing.imageUrl.split('/images/')[1];
+        fs.unlink(`images/${filename}`, ()=> {
+        Thing.deleteOne({_id: req.params.id}) 
+        .then(() => res.status(200).json({message: "Objet supprimé"}))
+        .catch(error => res.status(404).json({error}))
+        });
+    })
+    .catch(error => res.status(500).json({error}))
 };
 
